@@ -16,7 +16,10 @@ public class Ticket {
     private Long ticketId;
     private String fromCity;
     private String toCity;
-    private int segmentCount;
+    private int segments;
     private int price;
+    private String currency;
+    private int travellerAmount;
+    private String traveller;
     private Long userId;
 }

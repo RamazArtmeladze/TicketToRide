@@ -81,7 +81,6 @@ public class DijkstraAlgorithm {
             if (current.equals(target)) {
                 List<Node> path = new ArrayList<>();
 
-                //  int i = 0; i < 5; i++
                 for (Node node = target; node != null; node = node.getPrevious()) {
                     path.add(node);
                 }

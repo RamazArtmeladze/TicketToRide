@@ -1,8 +1,11 @@
 package com.app.TicketUK.controller;
 
 
+import com.app.TicketUK.dto.FindTicketDto;
+import com.app.TicketUK.dto.FindTicketModelDto;
+import com.app.TicketUK.dto.SaveTicketDto;
+import com.app.TicketUK.dto.SaveTicketModelDto;
 import com.app.TicketUK.model.Segment;
-import com.app.TicketUK.model.Ticket;
 import com.app.TicketUK.service.TravelService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +31,15 @@ public class TravelController {
         return ResponseEntity.ok(savedSegment);
     }
 
-    @GetMapping("/calculate-cost")
-    public ResponseEntity<Ticket> calculateCost(@RequestParam String fromCity, @RequestParam String toCity) {
-        Ticket cost = travelService.calculateOptimalTravelCost(fromCity, toCity);
+    @PostMapping("/find-ticket")
+    public ResponseEntity<FindTicketModelDto> calculateCost(@RequestBody FindTicketDto findTicketDto) {
+        FindTicketModelDto cost = travelService.calculateOptimalTravelCost(findTicketDto);
         return ResponseEntity.ok(cost);
+    }
+
+    @PostMapping("/save-ticket")
+    public ResponseEntity<SaveTicketModelDto> saveTicket(@RequestBody SaveTicketDto saveTicketDto) {
+        SaveTicketModelDto savedTicket = travelService.saveTicket(saveTicketDto);
+        return ResponseEntity.ok(savedTicket);
     }
 }

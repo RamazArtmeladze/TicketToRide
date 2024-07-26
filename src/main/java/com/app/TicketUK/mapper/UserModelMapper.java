@@ -22,7 +22,6 @@ public class UserModelMapper {
                 .name(userRegistrationDto.getName())
                 .email(userRegistrationDto.getEmail())
                 .password(passwordEncoder.encode(userRegistrationDto.getPassword()))
-                .balance(40)
                 .build();
     }
     public UserModelDto toDto (User user) {

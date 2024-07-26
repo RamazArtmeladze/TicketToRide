@@ -1,11 +1,13 @@
 package com.app.TicketUK.service;
 
+import com.app.TicketUK.dto.FindTicketDto;
+import com.app.TicketUK.dto.FindTicketModelDto;
+import com.app.TicketUK.dto.SaveTicketDto;
+import com.app.TicketUK.dto.SaveTicketModelDto;
 import com.app.TicketUK.model.Ticket;
-import com.app.TicketUK.model.User;
 import com.app.TicketUK.repository.SegmentRepository;
 import com.app.TicketUK.model.Segment;
 import com.app.TicketUK.repository.TicketRepository;
-import com.app.TicketUK.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,6 @@ public class TravelService {
     private final SegmentRepository segmentRepository;
     private final TicketRepository ticketRepository;
     private final UserDataService userDataService;
-    private final UserRepository userRepository;
 
     public List<Segment> getSegments() {
         return segmentRepository.findAll();
@@ -28,12 +29,12 @@ public class TravelService {
         return segmentRepository.save(segment);
     }
 
-    public Ticket calculateOptimalTravelCost(String fromCity, String toCity) {
+    public FindTicketModelDto calculateOptimalTravelCost(FindTicketDto findTicketDto) {
         List<Segment> segments = segmentRepository.findAll();
 
         DijkstraAlgorithm.Graph graph = new DijkstraAlgorithm.Graph(segments); // create nodes with edges
-        DijkstraAlgorithm.Node sourceNode = graph.getNode(fromCity);
-        DijkstraAlgorithm.Node targetNode = graph.getNode(toCity);
+        DijkstraAlgorithm.Node sourceNode = graph.getNode(findTicketDto.getFromCity());
+        DijkstraAlgorithm.Node targetNode = graph.getNode(findTicketDto.getToCity());
 
         List<DijkstraAlgorithm.Node> shortestPath = DijkstraAlgorithm.findShortestPath(graph, sourceNode, targetNode);
 
@@ -54,7 +55,7 @@ public class TravelService {
 
         int ticketPrice = calculateTicketPrice(totalDistance);
 
-        return createTicket(fromCity, toCity, totalDistance, ticketPrice);
+        return findTicket(totalDistance, ticketPrice);
     }
 
     private static int calculateTicketPrice(int totalDistance) {
@@ -65,31 +66,52 @@ public class TravelService {
         int secondPart = (remainder == 1) ? 5 : (remainder == 2) ? 7 : 0;
 
         int ticketPrice = firstPart + secondPart;
+
         return ticketPrice;
     }
 
-    private Ticket createTicket(String fromCity, String toCity, int totalDistance, int ticketPrice) {
-        Long userId = userDataService.getAuthenticatedUserID().getUserId();
-        int balance = userRepository.findBalance(userId);
+    private FindTicketModelDto findTicket(int totalDistance, int ticketPrice) {
 
-        if (ticketPrice <= balance) {
-            Ticket ticket = Ticket.builder()
-                    .fromCity(fromCity)
-                    .toCity(toCity)
-                    .segmentCount(totalDistance)
-                    .price(ticketPrice)
-                    .userId(userId)
+        FindTicketModelDto ticket = FindTicketModelDto.builder()
+                .segmentCount(totalDistance)
+                .price(ticketPrice)
+                .currency("GBP")
+                .build();
+        return ticket;
+    }
+
+    public SaveTicketModelDto saveTicket(SaveTicketDto saveTicketDto) {
+        int change = saveTicketDto.getTravellerAmount() - saveTicketDto.getPrice();
+        Long userId = userDataService.getAuthenticatedUserID().getUserId();
+
+        if (change >= 0) {
+            SaveTicketModelDto ticket = SaveTicketModelDto.builder()
+                    .result("Success")
+                    .change(change)
+                    .currency("GBP")
                     .build();
 
-            ticketRepository.save(ticket);
-
-            User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-            user.setBalance(balance - ticketPrice);
-            userRepository.save(user);
+            Ticket savedTicket = Ticket.builder()
+                    .fromCity(saveTicketDto.getFromCity())
+                    .toCity(saveTicketDto.getToCity())
+                    .segments(saveTicketDto.getSegments())
+                    .price(saveTicketDto.getPrice())
+                    .currency("GBP")
+                    .travellerAmount(saveTicketDto.getTravellerAmount())
+                    .traveller(saveTicketDto.getTraveller())
+                    .userId(userId)
+                    .build();
+            ticketRepository.save(savedTicket);
 
             return ticket;
-        } else {
-            throw new RuntimeException("you don't have balance to purchase the ticket.");
+        }else {
+            SaveTicketModelDto ticket = SaveTicketModelDto.builder()
+                    .result("failure")
+                    .change(change)
+                    .currency("GBP")
+                    .build();
+
+            return ticket;
         }
     }
 }
