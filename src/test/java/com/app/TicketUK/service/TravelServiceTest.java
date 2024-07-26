@@ -26,14 +26,11 @@ public class TravelServiceTest {
     @Mock
     private SegmentRepository segmentRepository;
 
-
     @Mock
     private TicketRepository ticketRepository;
 
-
     @Mock
     private UserDataService userDataService;
-
 
     @InjectMocks
     private TravelService travelService;
