@@ -27,8 +27,8 @@ public class TravelController {
     }
 
     @PostMapping("/find-ticket")
-    public ResponseEntity<TicketWithPrice> calculateCost(@RequestBody TicketSearchDto ticketSearchDto) {
-        TicketWithPrice cost = travelService.calculateOptimalTravelCost(ticketSearchDto);
+    public ResponseEntity<TicketWithPriceDto> calculateCost(@RequestBody TicketSearchDto ticketSearchDto) {
+        TicketWithPriceDto cost = travelService.calculateOptimalTravelCost(ticketSearchDto);
         return ResponseEntity.ok(cost);
     }
 

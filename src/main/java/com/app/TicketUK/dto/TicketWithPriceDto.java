@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class TicketWithPrice {
+public class TicketWithPriceDto {
     private int totalSegments;
     private int price;
     private String currency;

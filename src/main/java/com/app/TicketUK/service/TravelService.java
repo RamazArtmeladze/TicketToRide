@@ -41,7 +41,7 @@ public class TravelService {
         return new DestinationDto(savedDestination);
     }
 
-    public TicketWithPrice calculateOptimalTravelCost(TicketSearchDto ticketSearchDto) {
+    public TicketWithPriceDto calculateOptimalTravelCost(TicketSearchDto ticketSearchDto) {
         List<Destination> destinations = segmentRepository.findAll();
 
         Graph graph = new DijkstraAlgorithm.Graph(destinations);
@@ -66,7 +66,7 @@ public class TravelService {
 
         int ticketPrice = calculateTicketPrice(totalDistance);
 
-        return new TicketWithPrice(totalDistance, ticketPrice, "GBP");
+        return new TicketWithPriceDto(totalDistance, ticketPrice, "GBP");
     }
 
     private static int calculateTicketPrice(int totalDistance) {
@@ -93,9 +93,9 @@ public class TravelService {
                     .build());
 
 
-            return new PurchaseSuccess("Success", change, "GBP");
+            return new PurchaseSuccessDto("Success", change, "GBP");
         } else {
-            return new PurchaseFailure("Failure", Math.abs(change), "GBP");
+            return new PurchaseFailureDto("Failure", Math.abs(change), "GBP");
         }
     }
 }
