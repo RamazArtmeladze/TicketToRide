@@ -14,12 +14,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller for handling login requests.
+ */
 @RestController
 @RequiredArgsConstructor
 public class LoginController {
+
     private final UserDetailsService userDetailsService;
+
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * Handles the login request.
+     *
+     * @param loginForm the login form data
+     * @param session the HTTP session
+     * @return a string indicating the login result
+     */
     @PostMapping("/login")
     public String login(@RequestBody LoginUserDto loginForm, HttpSession session) {
         try {

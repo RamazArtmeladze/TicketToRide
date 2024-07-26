@@ -13,10 +13,20 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+/**
+ * Configuration class for Spring Security.
+ */
 @Configuration
 @EnableWebSecurity
 public class Config {
 
+    /**
+     * Configures the security filter chain.
+     *
+     * @param https the HttpSecurity object to configure
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity https) throws Exception {
         return  https
@@ -31,11 +41,23 @@ public class Config {
                 .build();
     }
 
+    /**
+     * Provides the authentication manager bean.
+     *
+     * @param authenticationConfiguration the authentication configuration
+     * @return the AuthenticationManager
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    /**
+     * Provides the BCrypt password encoder bean.
+     *
+     * @return the PasswordEncoder
+     */
     @Bean
     public PasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();

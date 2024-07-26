@@ -7,8 +7,14 @@ import lombok.ToString;
 
 import java.util.*;
 
+/**
+ * Service implementing Dijkstra's algorithm for finding the shortest path in a graph.
+ */
 public class DijkstraAlgorithm {
 
+    /**
+     * Represents a node in the graph.
+     */
     @Getter
     @Setter
     @ToString
@@ -28,9 +34,15 @@ public class DijkstraAlgorithm {
         }
     }
 
+    /**
+     * Represents an edge in the graph.
+     */
     public record Edge(Node source, Node target, int weight) {
     }
 
+    /**
+     * Represents the graph.
+     */
     public static class Graph {
 
         private final Map<String, Node> nodes;
@@ -62,6 +74,14 @@ public class DijkstraAlgorithm {
         }
     }
 
+    /**
+     * Finds the shortest path between two nodes using Dijkstra's algorithm.
+     *
+     * @param graph the graph
+     * @param departureNode the departure node
+     * @param arrivalNode the arrival node
+     * @return the list of nodes representing the shortest path
+     */
     public static List<Node> findShortestPath(Graph graph, Node departureNode, Node arrivalNode) {
         PriorityQueue<Node> frontier = new PriorityQueue<>(Comparator.comparingInt(Node::getDistance));
         Set<Node> exploredNodes = new HashSet<>();

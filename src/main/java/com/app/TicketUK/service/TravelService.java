@@ -15,14 +15,24 @@ import java.util.List;
 
 import static com.app.TicketUK.service.DijkstraAlgorithm.findShortestPath;
 
+/**
+ * Service for handling travel-related operations.
+ */
 @Service
 @RequiredArgsConstructor
 public class TravelService {
 
     private final SegmentRepository segmentRepository;
+
     private final TicketRepository ticketRepository;
+
     private final UserDataService userDataService;
 
+    /**
+     * Retrieves all travel segments.
+     *
+     * @return a list of all travel segments
+     */
     public List<DestinationDto> getSegments() {
         return segmentRepository.findAll()
                 .stream()
@@ -30,6 +40,12 @@ public class TravelService {
                 .toList();
     }
 
+    /**
+     * Adds a new travel segment.
+     *
+     * @param destinationDto the travel segment data
+     * @return the added travel segment
+     */
     public DestinationDto addSegment(DestinationDto destinationDto) {
         Destination destination = new Destination();
         destination.setId(destinationDto.getId());
@@ -41,6 +57,12 @@ public class TravelService {
         return new DestinationDto(savedDestination);
     }
 
+    /**
+     * Calculates the optimal travel cost based on the travel segment.
+     *
+     * @param ticketSearchDto the ticket search data
+     * @return the ticket with price details
+     */
     public TicketWithPriceDto calculateOptimalTravelCost(TicketSearchDto ticketSearchDto) {
         List<Destination> destinations = segmentRepository.findAll();
 
@@ -76,6 +98,12 @@ public class TravelService {
         return divisionResult * 10 + ((divisionRemainder == 1) ? 5 : (divisionRemainder == 2) ? 7 : 0);
     }
 
+    /**
+     * Saves a ticket purchase.
+     *
+     * @param ticketDto the ticket data
+     * @return the saved ticket purchase
+     */
     public TicketPurchase saveTicket(TicketDto ticketDto) {
         int change = ticketDto.getTravellerAmount() - ticketDto.getPrice();
         Long userId = userDataService.getAuthenticatedUserID().getUserId();

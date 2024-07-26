@@ -10,12 +10,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller for handling user-related requests.
+ */
 @RestController
 @AllArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
+    /**
+     * Registers a new user.
+     *
+     * @param userRegistrationDto the user registration data
+     * @return the registered user
+     */
     @PostMapping("/userRegistration")
     public ResponseEntity <UserModelDto> registerUser (@RequestBody UserRegistrationDto userRegistrationDto) {
         return new ResponseEntity<>(

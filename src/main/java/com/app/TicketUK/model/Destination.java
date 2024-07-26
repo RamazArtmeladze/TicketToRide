@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Entity representing a travel destination.
+ */
 @Entity
 @Getter
 @Setter
@@ -12,7 +15,10 @@ public class Destination {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String departure;
+
     private String arrival;
+
     private int segmentCount;
 }

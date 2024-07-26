@@ -13,12 +13,22 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
+/**
+ * Service for handling user-related operations.
+ */
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
+
     private final UserModelMapper mapper;
 
+    /**
+     * Registers a new user.
+     *
+     * @param userRegistrationDto the user registration data
+     * @return the registered user
+     */
     public UserModelDto registerUser(UserRegistrationDto userRegistrationDto) {
         User userModel = mapper.toEntity(userRegistrationDto);
         User savedUser = userRepository.save(userModel);
