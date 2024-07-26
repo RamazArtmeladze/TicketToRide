@@ -4,14 +4,9 @@ import static org.mockito.Mockito.*;
 
 import com.app.TicketUK.dto.*;
 import com.app.TicketUK.model.Destination;
-import com.app.TicketUK.model.Ticket;
 import com.app.TicketUK.model.User;
 import com.app.TicketUK.repository.SegmentRepository;
 import com.app.TicketUK.repository.TicketRepository;
-import com.app.TicketUK.service.DijkstraAlgorithm.Graph;
-import com.app.TicketUK.service.DijkstraAlgorithm.Node;
-import com.app.TicketUK.service.TravelService;
-import com.app.TicketUK.service.UserDataService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
