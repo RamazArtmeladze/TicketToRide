@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PurchaseFailureDto implements TicketPurchaseDto {
+public class PurchaseSuccess implements TicketPurchase {
     private String result;
-    private int lackOf;
+    private int change;
     private String currency;
 }

@@ -76,7 +76,7 @@ public class TravelService {
         return divisionResult * 10 + ((divisionRemainder == 1) ? 5 : (divisionRemainder == 2) ? 7 : 0);
     }
 
-    public TicketPurchaseDto saveTicket(TicketDto ticketDto) {
+    public TicketPurchase saveTicket(TicketDto ticketDto) {
         int change = ticketDto.getTravellerAmount() - ticketDto.getPrice();
         Long userId = userDataService.getAuthenticatedUserID().getUserId();
 
@@ -93,9 +93,9 @@ public class TravelService {
                     .build());
 
 
-            return new PurchaseSuccessDto("Success", change, "GBP");
+            return new PurchaseSuccess("Success", change, "GBP");
         } else {
-            return new PurchaseFailureDto("Failure", Math.abs(change), "GBP");
+            return new PurchaseFailure("Failure", Math.abs(change), "GBP");
         }
     }
 }

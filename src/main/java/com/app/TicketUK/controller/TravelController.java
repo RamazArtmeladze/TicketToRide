@@ -33,8 +33,8 @@ public class TravelController {
     }
 
     @PostMapping("/save-ticket")
-    public ResponseEntity<TicketPurchaseDto> saveTicket(@RequestBody TicketDto ticketDto) {
-        TicketPurchaseDto savedTicket = travelService.saveTicket(ticketDto);
+    public ResponseEntity<TicketPurchase> saveTicket(@RequestBody TicketDto ticketDto) {
+        TicketPurchase savedTicket = travelService.saveTicket(ticketDto);
         return ResponseEntity.ok(savedTicket);
     }
 }
