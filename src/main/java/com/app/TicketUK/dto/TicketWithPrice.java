@@ -9,7 +9,8 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class FindTicketDto {
-    private String fromCity;
-    private String toCity;
+public class TicketWithPrice {
+    private int totalSegments;
+    private int price;
+    private String currency;
 }

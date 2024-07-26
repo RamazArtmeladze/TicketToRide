@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class SaveTicketModelDto {
-    private String result;
-    private int change;
-    private String currency;
+public class TicketSearchDto {
+    private String departure;
+    private String arrival;
 }

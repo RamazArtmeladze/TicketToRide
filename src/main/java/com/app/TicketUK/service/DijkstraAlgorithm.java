@@ -1,6 +1,6 @@
 package com.app.TicketUK.service;
 
-import com.app.TicketUK.model.Segment;
+import com.app.TicketUK.model.Destination;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,21 +9,22 @@ import java.util.*;
 
 public class DijkstraAlgorithm {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @ToString
     public static class Node {
         private final String cityName;
-        private final List<Edge> edges;
+        private final List<Edge> destinations;
         private int distance = Integer.MAX_VALUE;
         private Node previous;
 
         public Node(String cityName) {
             this.cityName = cityName;
-            this.edges = new ArrayList<>();
+            this.destinations = new ArrayList<>();
         }
 
         public void addEdge(Node targetNode, int weight) {
-            edges.add(new Edge(this, targetNode, weight));
+            destinations.add(new Edge(this, targetNode, weight));
         }
     }
 
@@ -31,18 +32,20 @@ public class DijkstraAlgorithm {
     }
 
     public static class Graph {
+
         private final Map<String, Node> nodes;
-        public Graph(List<Segment> segments) {
+
+        public Graph(List<Destination> destinations) {
             nodes = new HashMap<>(); // value is null
 
-            for (Segment segment : segments) {
+            for (Destination destination : destinations) {
                 // create node in nodes hashMap for each segment
-                nodes.putIfAbsent(segment.getFromCity(), new Node(segment.getFromCity()));
-                nodes.putIfAbsent(segment.getToCity(), new Node(segment.getToCity()));
+                nodes.putIfAbsent(destination.getDeparture(), new Node(destination.getDeparture()));
+                nodes.putIfAbsent(destination.getArrival(), new Node(destination.getArrival()));
 
-                Node fromNode = nodes.get(segment.getFromCity());
-                Node toNode = nodes.get(segment.getToCity());
-                int weight = segment.getSegmentCount();
+                Node fromNode = nodes.get(destination.getDeparture());
+                Node toNode = nodes.get(destination.getArrival());
+                int weight = destination.getSegmentCount();
 
                 //add edge to node
                 fromNode.addEdge(toNode, weight);
@@ -59,49 +62,46 @@ public class DijkstraAlgorithm {
         }
     }
 
-    public static List<Node> findShortestPath(Graph graph, Node source, Node target) {
-        PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(Node::getDistance));
+    public static List<Node> findShortestPath(Graph graph, Node departureNode, Node arrivalNode) {
+        PriorityQueue<Node> frontier = new PriorityQueue<>(Comparator.comparingInt(Node::getDistance));
+        Set<Node> exploredNodes = new HashSet<>();
         Map<Node, Integer> distances = new HashMap<>();
-        Set<Node> visited = new HashSet<>();
-
 
         for (Node node : graph.getNodes()) {
             distances.put(node, node.getDistance());
         }
 
+        distances.put(departureNode, 0);  // update distance for departureNode node
+        departureNode.setDistance(0); // set distance for departureNode
+        frontier.add(departureNode); // add departureNode in frontier
 
-        distances.put(source, 0);  // update distance for source node
-        source.setDistance(0); // set distance for source
-        queue.add(source); // add source in queue
+        while (!frontier.isEmpty()) {
+            // retrieve and remove node with the smallest distance from frontier (from city)  and then return this value
+            Node currentNode = frontier.poll();
 
-        while (!queue.isEmpty()) {
-            // retrieve and remove node with the smallest distance from queue (from city)  and then return this value
-            Node current = queue.poll();
-
-            if (current.equals(target)) {
+            if (currentNode.equals(arrivalNode)) {
                 List<Node> path = new ArrayList<>();
 
-                for (Node node = target; node != null; node = node.getPrevious()) {
+                for (Node node = arrivalNode; node != null; node = node.getPrevious()) {
                     path.add(node);
                 }
                 Collections.reverse(path);
                 return path;
             }
 
-            if (visited.contains(current)) continue;
-            visited.add(current);
+            if (exploredNodes.contains(currentNode)) continue;
+            exploredNodes.add(currentNode);
 
-
-            for (Edge edge : current.getEdges()) {
+            for (Edge edge : currentNode.getDestinations()) {
                 Node neighbor = edge.target();
 
-                int newDist = distances.get(current) + edge.weight();
+                int newDist = distances.get(currentNode) + edge.weight();
 
                 if (newDist < distances.get(neighbor)) {
                     distances.put(neighbor, newDist);
                     neighbor.setDistance(newDist);
-                    neighbor.setPrevious(current);
-                    queue.add(neighbor);
+                    neighbor.setPrevious(currentNode);
+                    frontier.add(neighbor);
                 }
             }
         }
@@ -109,4 +109,3 @@ public class DijkstraAlgorithm {
         return Collections.emptyList();
     }
 }
-

@@ -7,12 +7,12 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "segments")
-public class Segment {
+@Table(name = "destinations")
+public class Destination {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String fromCity;
-    private String toCity;
+    private String departure;
+    private String arrival;
     private int segmentCount;
 }

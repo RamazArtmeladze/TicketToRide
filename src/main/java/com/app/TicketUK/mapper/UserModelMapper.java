@@ -14,17 +14,19 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @Component
 public class UserModelMapper {
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User toEntity (UserRegistrationDto userRegistrationDto) {
+    public User toEntity(UserRegistrationDto userRegistrationDto) {
         return User.builder()
                 .name(userRegistrationDto.getName())
                 .email(userRegistrationDto.getEmail())
                 .password(passwordEncoder.encode(userRegistrationDto.getPassword()))
                 .build();
     }
-    public UserModelDto toDto (User user) {
+
+    public UserModelDto toDto(User user) {
         return UserModelDto.builder()
                 .userId(user.getUserId())
                 .name(user.getName())

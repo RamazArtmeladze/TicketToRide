@@ -10,10 +10,10 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class SaveTicketDto {
-    private String fromCity;
-    private String toCity;
-    private int segments;
+public class TicketDto {
+    private String departure;
+    private String arrival;
+    private int segmentCount;
     private int price;
     private String currency;
     private int travellerAmount;

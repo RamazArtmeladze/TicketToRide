@@ -14,9 +14,9 @@ public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ticketId;
-    private String fromCity;
-    private String toCity;
-    private int segments;
+    private String departure;
+    private String arrival;
+    private int segmentCount;
     private int price;
     private String currency;
     private int travellerAmount;

@@ -1,16 +1,14 @@
 package com.app.TicketUK.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
-public class FindTicketModelDto {
-    private int segmentCount;
-    private int price;
+public class PurchaseSuccessDto implements TicketPurchaseDto {
+    private String result;
+    private int change;
     private String currency;
 }

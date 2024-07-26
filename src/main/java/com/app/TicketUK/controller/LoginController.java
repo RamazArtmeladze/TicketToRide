@@ -24,19 +24,14 @@ public class LoginController {
     public String login(@RequestBody LoginUserDto loginForm, HttpSession session) {
         try {
             UserDetails userDetails = userDetailsService.loadUserByUsername(loginForm.getEmail());
-
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword())
             );
-
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
             session.setAttribute("userDetails", userDetails);
 
             return "Login successful!";
-
         } catch (AuthenticationException e) {
-
             return "failed";
         }
     }

@@ -1,17 +1,19 @@
 package com.app.TicketUK.service;
 
-import com.app.TicketUK.dto.FindTicketDto;
-import com.app.TicketUK.dto.FindTicketModelDto;
-import com.app.TicketUK.dto.SaveTicketDto;
-import com.app.TicketUK.dto.SaveTicketModelDto;
+import com.app.TicketUK.dto.*;
+import com.app.TicketUK.model.Destination;
 import com.app.TicketUK.model.Ticket;
 import com.app.TicketUK.repository.SegmentRepository;
-import com.app.TicketUK.model.Segment;
 import com.app.TicketUK.repository.TicketRepository;
+import com.app.TicketUK.service.DijkstraAlgorithm.Edge;
+import com.app.TicketUK.service.DijkstraAlgorithm.Graph;
+import com.app.TicketUK.service.DijkstraAlgorithm.Node;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.app.TicketUK.service.DijkstraAlgorithm.findShortestPath;
 
 @Service
 @RequiredArgsConstructor
@@ -21,31 +23,40 @@ public class TravelService {
     private final TicketRepository ticketRepository;
     private final UserDataService userDataService;
 
-    public List<Segment> getSegments() {
-        return segmentRepository.findAll();
+    public List<DestinationDto> getSegments() {
+        return segmentRepository.findAll()
+                .stream()
+                .map(DestinationDto::new)
+                .toList();
     }
 
-    public Segment addSegment(Segment segment) {
-        return segmentRepository.save(segment);
+    public DestinationDto addSegment(DestinationDto destinationDto) {
+        Destination destination = new Destination();
+        destination.setId(destinationDto.getId());
+        destination.setArrival(destinationDto.getArrival());
+        destination.setDeparture(destinationDto.getDeparture());
+        destination.setSegmentCount(destinationDto.getSegmentCount());
+        Destination savedDestination = segmentRepository.save(destination);
+
+        return new DestinationDto(savedDestination);
     }
 
-    public FindTicketModelDto calculateOptimalTravelCost(FindTicketDto findTicketDto) {
-        List<Segment> segments = segmentRepository.findAll();
+    public TicketWithPrice calculateOptimalTravelCost(TicketSearchDto ticketSearchDto) {
+        List<Destination> destinations = segmentRepository.findAll();
 
-        DijkstraAlgorithm.Graph graph = new DijkstraAlgorithm.Graph(segments); // create nodes with edges
-        DijkstraAlgorithm.Node sourceNode = graph.getNode(findTicketDto.getFromCity());
-        DijkstraAlgorithm.Node targetNode = graph.getNode(findTicketDto.getToCity());
+        Graph graph = new DijkstraAlgorithm.Graph(destinations);
+        Node sourceNode = graph.getNode(ticketSearchDto.getDeparture());
+        Node targetNode = graph.getNode(ticketSearchDto.getArrival());
 
-        List<DijkstraAlgorithm.Node> shortestPath = DijkstraAlgorithm.findShortestPath(graph, sourceNode, targetNode);
+        List<Node> shortestPath = findShortestPath(graph, sourceNode, targetNode);
 
         int totalDistance = 0;
 
         for (int i = 0; i < shortestPath.size() - 1; i++) {
+            Node current = shortestPath.get(i);
+            Node next = shortestPath.get(i + 1);
 
-            DijkstraAlgorithm.Node current = shortestPath.get(i);
-            DijkstraAlgorithm.Node next = shortestPath.get(i + 1);
-
-            for (DijkstraAlgorithm.Edge edge : current.getEdges()) {
+            for (Edge edge : current.getDestinations()) {
                 if (edge.target().equals(next)) {
                     totalDistance += edge.weight();
                     break;
@@ -55,63 +66,36 @@ public class TravelService {
 
         int ticketPrice = calculateTicketPrice(totalDistance);
 
-        return findTicket(totalDistance, ticketPrice);
+        return new TicketWithPrice(totalDistance, ticketPrice, "GBP");
     }
 
     private static int calculateTicketPrice(int totalDistance) {
-        int higher = totalDistance / 3;
-        int remainder = totalDistance % 3;
+        int divisionResult = totalDistance / 3;
+        int divisionRemainder = totalDistance % 3;
 
-        int firstPart = higher * 10;
-        int secondPart = (remainder == 1) ? 5 : (remainder == 2) ? 7 : 0;
-
-        int ticketPrice = firstPart + secondPart;
-
-        return ticketPrice;
+        return divisionResult * 10 + ((divisionRemainder == 1) ? 5 : (divisionRemainder == 2) ? 7 : 0);
     }
 
-    private FindTicketModelDto findTicket(int totalDistance, int ticketPrice) {
-
-        FindTicketModelDto ticket = FindTicketModelDto.builder()
-                .segmentCount(totalDistance)
-                .price(ticketPrice)
-                .currency("GBP")
-                .build();
-        return ticket;
-    }
-
-    public SaveTicketModelDto saveTicket(SaveTicketDto saveTicketDto) {
-        int change = saveTicketDto.getTravellerAmount() - saveTicketDto.getPrice();
+    public TicketPurchaseDto saveTicket(TicketDto ticketDto) {
+        int change = ticketDto.getTravellerAmount() - ticketDto.getPrice();
         Long userId = userDataService.getAuthenticatedUserID().getUserId();
 
         if (change >= 0) {
-            SaveTicketModelDto ticket = SaveTicketModelDto.builder()
-                    .result("Success")
-                    .change(change)
+            ticketRepository.save(Ticket.builder()
+                    .departure(ticketDto.getDeparture())
+                    .arrival(ticketDto.getArrival())
+                    .segmentCount(ticketDto.getSegmentCount())
+                    .price(ticketDto.getPrice())
                     .currency("GBP")
-                    .build();
-
-            Ticket savedTicket = Ticket.builder()
-                    .fromCity(saveTicketDto.getFromCity())
-                    .toCity(saveTicketDto.getToCity())
-                    .segments(saveTicketDto.getSegments())
-                    .price(saveTicketDto.getPrice())
-                    .currency("GBP")
-                    .travellerAmount(saveTicketDto.getTravellerAmount())
-                    .traveller(saveTicketDto.getTraveller())
+                    .travellerAmount(ticketDto.getTravellerAmount())
+                    .traveller(ticketDto.getTraveller())
                     .userId(userId)
-                    .build();
-            ticketRepository.save(savedTicket);
+                    .build());
 
-            return ticket;
-        }else {
-            SaveTicketModelDto ticket = SaveTicketModelDto.builder()
-                    .result("failure")
-                    .change(change)
-                    .currency("GBP")
-                    .build();
 
-            return ticket;
+            return new PurchaseSuccessDto("Success", change, "GBP");
+        } else {
+            return new PurchaseFailureDto("Failure", Math.abs(change), "GBP");
         }
     }
 }

@@ -6,9 +6,9 @@ create table users (
       password VARCHAR(255) NOT NULL
 );
 
-create table segments (
+create table destinations (
       id SERIAL PRIMARY KEY,
-      from_City VARCHAR(255) NOT NULL,
-      to_City VARCHAR(255) NOT NULL,
-      segment_Count int NOT NULL
+      departure VARCHAR(255) NOT NULL,
+      arrival VARCHAR(255) NOT NULL,
+      segment_count int NOT NULL
 );

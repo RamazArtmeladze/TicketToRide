@@ -19,8 +19,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserModelMapper mapper;
 
-    public UserModelDto registerUser (UserRegistrationDto userRegistrationDto) {
-
+    public UserModelDto registerUser(UserRegistrationDto userRegistrationDto) {
         User userModel = mapper.toEntity(userRegistrationDto);
         User savedUser = userRepository.save(userModel);
 
@@ -32,6 +31,6 @@ public class UserService implements UserDetailsService {
         User userModel = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-        return new org.springframework.security.core.userdetails.User(userModel.getEmail(), userModel.getPassword(),new ArrayList<>());
+        return new org.springframework.security.core.userdetails.User(userModel.getEmail(), userModel.getPassword(), new ArrayList<>());
     }
 }
